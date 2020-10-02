@@ -9,7 +9,7 @@ app.use(express.static('public'))
 app.use(express.json())
 
 app.post('/list-items', (req, res) => {
-  db.all('SELECT * FROM items', (err, rows) => res.send(rows))
+  db.all('SELECT rowid as id,* FROM items', (err, rows) => res.send(rows))
 })
 
 app.post('/add-item', (req, res) => {
@@ -32,7 +32,16 @@ app.post('/update-item', (req, res) => {
 })
 
 app.post('/delete-item', (req, res) => {
-  res.send('Hello World!')
+  const itemId = req.body.itemId
+  db.run('DELETE FROM items WHERE rowid=?', itemId,
+    err => {
+      if (err) {
+        console.log('Error', err)
+        return res.send({})
+      }
+      res.send({})
+    }
+  )
 })
 
 app.listen(port, () => {

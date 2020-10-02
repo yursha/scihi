@@ -1,6 +1,9 @@
 <html>
 <head>
   <style>
+    button {
+      margin-bottom: 0.5rem;
+    }
     .form-control {
       display: flex;
       flex-direction: column;
@@ -14,6 +17,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
+      console.log(`POST ${url}`, data)
       return response.json()
     }
 
@@ -40,6 +44,11 @@
         let div = document.createElement('div')
         let title = document.createElement('h2')
         title.innerText = item.name
+        title.style.cursor = 'pointer'
+        title.addEventListener('click', () => {
+          console.log(`choose item ${item.id}: "${item.name}"`)
+          window.zzz.currentItemId = item.id
+        })
         div.appendChild(title)
 
         let author = document.createElement('h3')
@@ -58,6 +67,11 @@
       console.log(item)
     }
 
+    function updateViewAfterDelete(item) {
+      window.zzz.currentItemId = 0
+      onListItems()
+    }
+
     function onListItems() {
       postRequest('list-items').then(updateViewAfterList)
     }
@@ -66,7 +80,12 @@
       postRequest('add-item', item).then(updateViewAfterAdd)
     }
 
+    function deleteCurrentItem() {
+      postRequest('delete-item', {itemId: window.zzz.currentItemId}).then(updateViewAfterDelete)
+    }
+
     window.addEventListener('load', (event) => {
+      window.zzz = {} /* start with empty context */
       onListItems()
 
       /* Hook up event handlers */
@@ -83,6 +102,12 @@
           item[v[0]] = v[1]
         }
         onAddItem(item)
+      })
+
+      let deleteItemButton = document.getElementById("delete-item-button")
+      deleteItemButton.addEventListener("click", e => {
+        e.preventDefault()
+        deleteCurrentItem()
       })
     })
   </script>
@@ -112,6 +137,7 @@
         <textarea id="description" name="description" style="resize: none;"></textarea>
       </div>
       <button>Update</button>
+      <button id="delete-item-button" style="background-color:tomato">Delete</button>
     </form>
     <form id="add-item-form" style="display: flex; flex-direction: column;">
       <div class="form-control">
