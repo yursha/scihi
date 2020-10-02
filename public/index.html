@@ -1,0 +1,106 @@
+<html>
+<head>
+  <style>
+    .form-control {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+    }
+  </style>
+  <script>
+    async function postRequest(url, data = {}) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      return response.json()
+    }
+
+    function updateViewAfterList(items) {
+      console.log(items)
+    }
+
+    function updateViewAfterAdd(item) {
+      console.log(item)
+    }
+
+    function onListItems() {
+      postRequest('list-items').then(updateViewAfterList)
+    }
+
+    function onAddItem(item) {
+      postRequest('add-item', item).then(updateViewAfterAdd)
+    }
+
+    window.addEventListener('load', (event) => {
+      onListItems()
+
+      /* Hook up event handlers */
+
+      let addItemForm = document.getElementById("add-item-form")
+      addItemForm.addEventListener("submit", e => {
+        e.preventDefault()
+        new FormData(e.target)
+        e.target.reset()
+      })
+      addItemForm.addEventListener("formdata", e => {
+        let item = {}
+        for (let v of e.formData) {
+          item[v[0]] = v[1]
+        }
+        onAddItem(item)
+      })
+    })
+  </script>
+</head>
+<body style="display: flex; margin: 0; padding: 0;">
+  <div id="itemsPane" style="flex: 9;">
+  </div>
+  <div style="flex: 3; background-color: lightgray; padding: 1em; display: flex; flex-direction: column; justify-content: space-between;">
+    <form style="display: flex; flex-direction: column;">
+      <div class="form-control">
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date"/>
+      </div>
+
+      <div class="form-control">
+        <label for="name">Name</label>
+        <input id="name" name="name"/>
+      </div>
+
+      <div class="form-control">
+        <label for="author">Author</label>
+        <input id="author" name="author"/>
+      </div>
+
+      <div class="form-control">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" style="resize: none;"></textarea>
+      </div>
+      <button>Update</button>
+    </form>
+    <form id="add-item-form" style="display: flex; flex-direction: column;">
+      <div class="form-control">
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date"/>
+      </div>
+
+      <div class="form-control">
+        <label for="name">Name</label>
+        <input id="name" name="name"/>
+      </div>
+
+      <div class="form-control">
+        <label for="author">Author</label>
+        <input id="author" name="author"/>
+      </div>
+
+      <div class="form-control">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" style="resize: none;"></textarea>
+      </div>
+      <button type"submit">Add</button>
+    </form>
+  </div>
+</body>
