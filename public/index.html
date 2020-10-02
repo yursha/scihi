@@ -18,7 +18,40 @@
     }
 
     function updateViewAfterList(items) {
-      console.log(items)
+      const itemContainer = document.getElementById('item-container')
+      while (itemContainer.firstChild) {
+        itemContainer.removeChild(itemContainer.firstChild);
+      }
+      for (let item of items) {
+        item.date = new Date(item.date)
+      }
+      items.sort((a, b) => b.date - a.date)
+
+      let year = null
+      for (let item of items) {
+        let itemYear = item.date.getFullYear()
+        if (year == null || year > itemYear) {
+          let yearHeading = document.createElement('h1')
+          yearHeading.innerText = itemYear
+          itemContainer.appendChild(yearHeading)
+          year = itemYear
+        }
+
+        let div = document.createElement('div')
+        let title = document.createElement('h2')
+        title.innerText = item.name
+        div.appendChild(title)
+
+        let author = document.createElement('h3')
+        author.innerText = item.author
+        div.appendChild(author)
+
+        let desc = document.createElement('p')
+        desc.innerText = item.description
+        div.appendChild(desc)
+
+        itemContainer.appendChild(div)
+      }
     }
 
     function updateViewAfterAdd(item) {
@@ -55,7 +88,7 @@
   </script>
 </head>
 <body style="display: flex; margin: 0; padding: 0;">
-  <div id="itemsPane" style="flex: 9;">
+  <div id="item-container" style="flex: 9; padding: 1em">
   </div>
   <div style="flex: 3; background-color: lightgray; padding: 1em; display: flex; flex-direction: column; justify-content: space-between;">
     <form style="display: flex; flex-direction: column;">
