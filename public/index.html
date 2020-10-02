@@ -4,6 +4,9 @@
     button {
       margin-bottom: 0.5rem;
     }
+    input, textarea {
+      width: 100%;
+    }
     .form-control {
       display: flex;
       flex-direction: column;
@@ -17,8 +20,19 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      console.log(`POST ${url}`, data)
-      return response.json()
+      const jsonResponse = await response.json()
+      console.log(`POST ${url}`, jsonResponse)
+      return jsonResponse
+    }
+
+    function selectItem(item) {
+      console.log(`choose item ${item.id}: "${item.name}"`)
+      window.zzz.currentItemId = item.id
+      let updateForm = document.getElementById("update-item-form")
+      updateForm.name.value = item.name
+      updateForm.author.value = item.author
+      updateForm.description.value = item.description
+      updateForm.date.value = item.date.toISOString().substring(0, 10)
     }
 
     function updateViewAfterList(items) {
@@ -45,10 +59,7 @@
         let title = document.createElement('h2')
         title.innerText = item.name
         title.style.cursor = 'pointer'
-        title.addEventListener('click', () => {
-          console.log(`choose item ${item.id}: "${item.name}"`)
-          window.zzz.currentItemId = item.id
-        })
+        title.addEventListener('click', () => selectItem(item))
         div.appendChild(title)
 
         let author = document.createElement('h3')
@@ -72,6 +83,10 @@
       onListItems()
     }
 
+    function updateViewAfterUpdate() {
+      onListItems()
+    }
+
     function onListItems() {
       postRequest('list-items').then(updateViewAfterList)
     }
@@ -82,6 +97,10 @@
 
     function deleteCurrentItem() {
       postRequest('delete-item', {itemId: window.zzz.currentItemId}).then(updateViewAfterDelete)
+    }
+
+    function onUpdateItem(item) {
+      postRequest('update-item', item).then(updateViewAfterUpdate)
     }
 
     window.addEventListener('load', (event) => {
@@ -109,6 +128,17 @@
         e.preventDefault()
         deleteCurrentItem()
       })
+
+      let updateItemButton = document.getElementById("update-item-button")
+      updateItemButton.addEventListener("click", e => {
+        e.preventDefault()
+        let form = e.target.form
+        onUpdateItem({ id: window.zzz.currentItemId, name: form.name.value,
+          date: form.date.value,
+          description: form.description.value,
+          author: form.author.value
+        })
+      })
     })
   </script>
 </head>
@@ -116,48 +146,64 @@
   <div id="item-container" style="flex: 9; padding: 1em">
   </div>
   <div style="flex: 3; background-color: lightgray; padding: 1em; display: flex; flex-direction: column; justify-content: space-between;">
-    <form style="display: flex; flex-direction: column;">
+    <form id="update-item-form" style="display: flex; flex-direction: column;">
       <div class="form-control">
-        <label for="date">Date</label>
-        <input id="date" name="date" type="date"/>
+        <label>
+          <div>Date</div>
+          <input name="date" type="date"/>
+        </label>
       </div>
 
       <div class="form-control">
-        <label for="name">Name</label>
-        <input id="name" name="name"/>
+        <label>
+          <div>Name</div>
+          <input name="name"/>
+        </label>
       </div>
 
       <div class="form-control">
-        <label for="author">Author</label>
-        <input id="author" name="author"/>
+        <label>
+          <div>Author</div>
+          <input name="author"/>
+        </label>
       </div>
 
       <div class="form-control">
-        <label for="description">Description</label>
-        <textarea id="description" name="description" style="resize: none;"></textarea>
+        <label>
+          <div>Description</div>
+          <textarea name="description" style="resize: none;"></textarea>
+        </label>
       </div>
-      <button>Update</button>
+      <button id="update-item-button">Update</button>
       <button id="delete-item-button" style="background-color:tomato">Delete</button>
     </form>
     <form id="add-item-form" style="display: flex; flex-direction: column;">
       <div class="form-control">
-        <label for="date">Date</label>
-        <input id="date" name="date" type="date"/>
+        <label>
+          <div>Date</div>
+          <input name="date" type="date"/>
+        </label>
       </div>
 
       <div class="form-control">
-        <label for="name">Name</label>
-        <input id="name" name="name"/>
+        <label>
+          <div>Name</div>
+          <input name="name"/>
+        </label>
       </div>
 
       <div class="form-control">
-        <label for="author">Author</label>
-        <input id="author" name="author"/>
+        <label>
+          <div>Author</div>
+          <input name="author"/>
+        </label>
       </div>
 
       <div class="form-control">
-        <label for="description">Description</label>
-        <textarea id="description" name="description" style="resize: none;"></textarea>
+        <label>
+          <div>Description</div>
+          <textarea name="description" style="resize: none;"></textarea>
+        </label>
       </div>
       <button type"submit">Add</button>
     </form>

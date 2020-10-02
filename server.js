@@ -28,7 +28,17 @@ app.post('/add-item', (req, res) => {
 })
 
 app.post('/update-item', (req, res) => {
-  res.send('Hello World!')
+  const item = req.body
+  db.run('UPDATE items SET date = ?, author = ?, name = ?, description = ? WHERE rowid = ?',
+         item.date, item.author, item.name, item.description, item.id,
+    err => {
+      if (err) {
+        console.log('Error', err)
+        return res.send({})
+      }
+      return res.send({})
+    }
+  )
 })
 
 app.post('/delete-item', (req, res) => {
