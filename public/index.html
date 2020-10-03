@@ -41,14 +41,14 @@
         itemContainer.removeChild(itemContainer.firstChild);
       }
       for (let item of items) {
-        item.date = new Date(item.date)
+        item.date = new Date(item.date + 'Z')
       }
-      items.sort((a, b) => b.date - a.date)
+      items.sort((a, b) => a.date - b.date)
 
       let year = null
       for (let item of items) {
-        let itemYear = item.date.getFullYear()
-        if (year == null || year > itemYear) {
+        let itemYear = item.date.toISOString().substring(0, 4)
+        if (year == null || year < itemYear) {
           let yearHeading = document.createElement('h1')
           yearHeading.innerText = itemYear
           itemContainer.appendChild(yearHeading)
