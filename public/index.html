@@ -47,6 +47,8 @@
 
       let year = null
       for (let item of items) {
+        console.log(item)
+        console.log(item.date.toISOString())
         let itemYear = item.date.toISOString().substring(0, 4)
         if (year == null || year < itemYear) {
           let yearHeading = document.createElement('h1')
@@ -75,7 +77,7 @@
     }
 
     function updateViewAfterAdd(item) {
-      console.log(item)
+      onListItems()
     }
 
     function updateViewAfterDelete(item) {
