@@ -1,5 +1,6 @@
 <html>
 <head>
+  <link rel="icon" type="image/png" href="/dna.png"/>
   <style>
     button {
       margin-bottom: 0.5rem;
@@ -41,7 +42,7 @@
         itemContainer.removeChild(itemContainer.firstChild);
       }
       for (let item of items) {
-        item.date = new Date(item.date + 'Z')
+        item.date = new Date(item.date + 'T00:00:00Z')
       }
       items.sort((a, b) => a.date - b.date)
 
@@ -49,7 +50,7 @@
       for (let item of items) {
         console.log(item)
         console.log(item.date.toISOString())
-        let itemYear = item.date.toISOString().substring(0, 4)
+        let itemYear = parseInt(item.date.toISOString().substring(0, 4))
         if (year == null || year < itemYear) {
           let yearHeading = document.createElement('h1')
           yearHeading.innerText = itemYear
