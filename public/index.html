@@ -37,14 +37,20 @@
     }
 
     function updateViewAfterList(items) {
-      const itemContainer = document.getElementById('item-container')
-      while (itemContainer.firstChild) {
-        itemContainer.removeChild(itemContainer.firstChild);
-      }
+      window.zzz.items = items
       for (let item of items) {
         item.date = new Date(item.date + 'T00:00:00Z')
       }
       items.sort((a, b) => a.date - b.date)
+      updateView()
+    }
+
+    function updateView() {
+      let items = filter(window.zzz.items)
+      const itemContainer = document.getElementById('item-container')
+      while (itemContainer.firstChild) {
+        itemContainer.removeChild(itemContainer.firstChild);
+      }
 
       let year = null
       for (let item of items) {
@@ -103,7 +109,35 @@
     }
 
     function onUpdateItem(item) {
+      console.log('Updating item', item)
       postRequest('update-item', item).then(updateViewAfterUpdate)
+    }
+
+    function filter(items) {
+      let filterInput = document.getElementById("filter")
+      let fromInput = document.getElementById("from")
+      let toInput = document.getElementById("to")
+
+      const keyword = filterInput.value
+      const from = fromInput.value
+      const to = toInput.value
+
+      if (keyword != '') {
+        items = items.filter(item =>
+            item.name.includes(keyword) ||
+            item.author.includes(keyword) ||
+            item.description.includes(keyword)
+        )
+      }
+      if (from != '') {
+        let fromDate = new Date(from)
+        items = items.filter(item => item.date >= fromDate)
+      }
+      if (to != '') {
+        let toDate = new Date(to)
+        items = items.filter(item => item.date <= toDate)
+      }
+      return items
     }
 
     window.addEventListener('load', (event) => {
@@ -142,11 +176,33 @@
           author: form.author.value
         })
       })
+
+      let filterInput = document.getElementById("filter")
+      filterInput.addEventListener("change", e => {
+        e.preventDefault()
+        updateView()
+      })
+      let fromInput = document.getElementById("from")
+      fromInput.addEventListener("change", e => {
+        e.preventDefault()
+        updateView()
+      })
+      let toInput = document.getElementById("to")
+      toInput.addEventListener("change", e => {
+        e.preventDefault()
+        updateView()
+      })
     })
   </script>
 </head>
 <body style="display: flex; margin: 0; padding: 0;">
-  <div id="item-container" style="flex: 9; padding: 1em; max-height: 100%; overflow: scroll; box-sizing: border-box;">
+  <div style="flex: 9; height: 100vh;">
+    <div style="display: flex; background-color: #1a237e; color: white; height: 7vh; padding: 1rem; box-sizing: border-box;">
+      <label>Filter<input id="filter" style="width: 10rem; margin: 0 1rem;"></label>
+      <label>From<input id="from" type='date' style="width: 10rem; margin: 0 1rem;"></label>
+      <label>To<input id="to" type='date' style="width: 10rem; margin: 0 1rem;"></label>
+    </div>
+    <div id="item-container" style="box-sizing: border-box; padding: 1em; height: 93vh; overflow: scroll; word-break: break-word;"></div>
   </div>
   <div style="flex: 3; background-color: lightgray; padding: 1em; display: flex; flex-direction: column; justify-content: space-between;">
     <form id="update-item-form" style="display: flex; flex-direction: column;">

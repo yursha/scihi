@@ -14,6 +14,7 @@ app.post('/list-items', (req, res) => {
 
 app.post('/add-item', (req, res) => {
   const item = req.body
+  console.log('Adding item', item)
   db.run('INSERT INTO items (date,author,name,description) VALUES (?,?,?,?)',
          item.date, item.author, item.name, item.description,
     err => {
@@ -29,14 +30,15 @@ app.post('/add-item', (req, res) => {
 
 app.post('/update-item', (req, res) => {
   const item = req.body
+  console.log('Updating item', item)
   db.run('UPDATE items SET date = ?, author = ?, name = ?, description = ? WHERE rowid = ?',
          item.date, item.author, item.name, item.description, item.id,
     err => {
       if (err) {
         console.log('Error', err)
-        return res.send({})
+        return res.send({ error: err })
       }
-      return res.send({})
+      return res.send({ status: 'ok' })
     }
   )
 })
