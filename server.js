@@ -27,7 +27,12 @@ function db_run(query, params) {
 }
 
 app.post('/list-items', async (req, res) => {
-  const rows = await db_all('SELECT rowid as id,* FROM items')
+  const rows = await db_all(`
+    SELECT items.rowid id, items.*, GROUP_CONCAT(tags.name) tags
+      FROM items
+      LEFT JOIN items_tags on items.rowid=items_tags.item_id
+      LEFT JOIN tags on tags.rowid=items_tags.tag_id GROUP by items.rowid
+  `)
   res.send(rows)
 })
 

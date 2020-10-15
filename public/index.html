@@ -74,6 +74,13 @@
         author.innerText = item.author
         div.appendChild(author)
 
+        if (item.tags) {
+          let tags = document.createElement('p')
+          tags.style.fontStyle = 'italic'
+          tags.innerText = item.tags.split(',').join(', ')
+          div.appendChild(tags)
+        }
+
         let desc = document.createElement('p')
         desc.innerText = item.description
         div.appendChild(desc)
