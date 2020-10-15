@@ -8,52 +8,53 @@ const port = 3000
 app.use(express.static('public'))
 app.use(express.json())
 
-app.post('/list-items', (req, res) => {
-  db.all('SELECT rowid as id,* FROM items', (err, rows) => res.send(rows))
+function db_all(query) {
+  return new Promise((resolve, reject) => {
+    db.all(query, (err, rows) => {
+      if (err) reject(error)
+      else resolve(rows)
+    })
+  })
+}
+
+function db_run(query, params) {
+  return new Promise((resolve, reject) => {
+    db.run(query, params, err => {
+      if (err) reject(error)
+      else resolve(this.lastID)
+    })
+  })
+}
+
+app.post('/list-items', async (req, res) => {
+  const rows = await db_all('SELECT rowid as id,* FROM items')
+  res.send(rows)
 })
 
-app.post('/add-item', (req, res) => {
+app.post('/add-item', async (req, res) => {
   const item = req.body
   console.log('Adding item', item)
-  db.run('INSERT INTO items (date,author,name,description) VALUES (?,?,?,?)',
-         item.date, item.author, item.name, item.description,
-    err => {
-      if (err) {
-        console.log('Error', err)
-        return res.send({})
-      }
-      console.log(this)
-      res.send({id: this.lastID, ...item})
-    }
+  const id = await db_run(
+    'INSERT INTO items (date,author,name,description) VALUES (?,?,?,?)',
+    [item.date, item.author, item.name, item.description]
   )
+  return res.send({id, ...item})
 })
 
-app.post('/update-item', (req, res) => {
+app.post('/update-item', async (req, res) => {
   const item = req.body
   console.log('Updating item', item)
-  db.run('UPDATE items SET date = ?, author = ?, name = ?, description = ? WHERE rowid = ?',
-         item.date, item.author, item.name, item.description, item.id,
-    err => {
-      if (err) {
-        console.log('Error', err)
-        return res.send({ error: err })
-      }
-      return res.send({ status: 'ok' })
-    }
+  await db_run(
+    'UPDATE items SET date = ?, author = ?, name = ?, description = ? WHERE rowid = ?',
+    [item.date, item.author, item.name, item.description, item.id]
   )
+  return res.send({ status: 'ok' })
 })
 
-app.post('/delete-item', (req, res) => {
+app.post('/delete-item', async (req, res) => {
   const itemId = req.body.itemId
-  db.run('DELETE FROM items WHERE rowid=?', itemId,
-    err => {
-      if (err) {
-        console.log('Error', err)
-        return res.send({})
-      }
-      res.send({})
-    }
-  )
+  await db_run('DELETE FROM items WHERE rowid=?', [itemId])
+  return res.send({})
 })
 
 app.listen(port, () => {
