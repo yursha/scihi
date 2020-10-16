@@ -124,15 +124,16 @@
       let fromInput = document.getElementById("from")
       let toInput = document.getElementById("to")
 
-      const keyword = filterInput.value
+      const keyword = filterInput.value.toLowerCase()
       const from = fromInput.value
       const to = toInput.value
 
       if (keyword != '') {
         items = items.filter(item =>
-            item.name.includes(keyword) ||
-            item.author.includes(keyword) ||
-            item.description.includes(keyword)
+            item.name.toLowerCase().includes(keyword) ||
+            item.author.toLowerCase().includes(keyword) ||
+            item.description.toLowerCase().includes(keyword) ||
+            (item.tags && item.tags.toLowerCase().includes(keyword))
         )
       }
       if (from != '') {
